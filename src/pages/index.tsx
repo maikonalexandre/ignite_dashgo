@@ -1,5 +1,5 @@
 import { Button, Flex, Stack } from '@chakra-ui/react'
-import {Input} from '../components/form/Input'
+import { Input } from '../components/form/Input'
 
 
 export default function SingIn () {
