@@ -4,25 +4,24 @@ interface ProfilePorps {
   showProfileData?: boolean;
 }
 
-
-export function Profile({showProfileData = true}: ProfilePorps){
-  return(
+export function Profile({ showProfileData = true }: ProfilePorps) {
+  return (
     <Flex align="center">
-  { showProfileData && (
-      <Box>
-      <Text mr="4" textAlign="right">
-        Maikon Alexandre
-      </Text>
-      <Text color="gray.300" fontSize="small" >
-        maikonalexandre574@gmail.com
-      </Text>
-    </Box>
-  )}
-    <Avatar
-      size="md"
-      src="https://github.com/maikonalexandre.png"
-      name="Maikon Alexandre"
-    />
-  </Flex>
+      {showProfileData && (
+        <Box>
+          <Text mr="4" textAlign="right">
+            Maikon Alexandre
+          </Text>
+          <Text mr="4" color="gray.300" fontSize="small" align="right">
+            maikonalexandre574@gmail.com
+          </Text>
+        </Box>
+      )}
+      <Avatar
+        size="md"
+        src="https://github.com/maikonalexandre.png"
+        name="Maikon Alexandre"
+      />
+    </Flex>
   );
 }
