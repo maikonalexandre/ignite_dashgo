@@ -14,21 +14,38 @@ import {
   Td,
   useBreakpointValue,
   Spinner,
+  Link,
 } from "@chakra-ui/react";
-import Link from "next/link";
+import { QueryClient } from "@tanstack/react-query";
+import NextLink from "next/link";
+import { useState } from "react";
 import { RiAddLine, RiPencilLine } from "react-icons/ri";
 import { Header } from "../../components/form/Header";
 import { Pagination } from "../../components/form/Pagination";
 import { SideBar } from "../../components/form/SideBar";
+import { api } from "../../services/api";
 import { useUsers } from "../../services/hooks/useUsers";
+import { queryClient } from '../../services/queryClient'
 
 export default function UserList() {
-  const { data, isLoading, error, isFetching } = useUsers();
+  const [page, setPage] =  useState(1);
+  const { data, isLoading, error, isFetching } = useUsers(page);
   const isWideVersion = useBreakpointValue({
     base: false,
     md: true,
     lg: true,
   });
+
+  async function handlePrefetUser(userId: string){
+    await queryClient.prefetchQuery(['user', userId],async () => {
+      const response = await api.get(`users/${userId}`)
+
+      return response.data;
+    },{
+      staleTime: 1000 * 60 * 10 //10 minutos
+    }
+    )
+  }
 
   return (
     <Box>
@@ -46,7 +63,7 @@ export default function UserList() {
               )}
             </Heading>
 
-            <Link href="/users/create" passHref>
+            <NextLink href="/users/create" passHref>
               <Button
                 as="a"
                 size="sm"
@@ -56,7 +73,7 @@ export default function UserList() {
               >
                 Criar novo
               </Button>
-            </Link>
+            </NextLink>
           </Flex>
           {isLoading ? (
             <Flex justify="center">
@@ -80,16 +97,19 @@ export default function UserList() {
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {data?.map((user) => {
+                  {data?.users.map((user) => {
                     return (
                       <Tr key={user.id}>
                         <Td px={["4", "4", "6"]}>
                           <Checkbox colorScheme="pink" />
                         </Td>
 
-                        <Td>
+                        <Td> 
                           <Box>
+                            <Link color='purple.400' onMouseEnter={()=> handlePrefetUser(user.id)}>
                             <Text fontWeight="bold">{user.name}</Text>
+                            </Link>
+
                             <Text fontSize="sm">{user.email}</Text>
                           </Box>
                         </Td>
@@ -116,7 +136,11 @@ export default function UserList() {
                   })}
                 </Tbody>
               </Table>
-              <Pagination />
+              <Pagination 
+                totalCountRegistros={data.totalCount}
+                currentPage={page}
+                onPageChange={setPage}
+              />
             </>
           )}
         </Box>

@@ -15,6 +15,11 @@ import { SideBar } from "../../components/form/SideBar";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import {useMutation} from '@tanstack/react-query'
+import { api } from "../../services/api";
+import { queryClient } from "../../services/queryClient";
+import { useRouter } from "next/router";
+
 
 type CreateFormData = {
   nome: string;
@@ -22,6 +27,7 @@ type CreateFormData = {
   password: string;
   passwordConfirmation: string;
 };
+
 
 const CreateUserFormSchema = yup.object({
   nome: yup.string().required("Nome é um campo obrigaório"),
@@ -36,15 +42,34 @@ const CreateUserFormSchema = yup.object({
 });
 
 export default function CreateUser() {
+
+  const router = useRouter();
+
+  const createUser = useMutation(async (user: CreateFormData)=> {
+    const response = await api.post('users', {
+      user: {
+        ...user,
+        createdAt: new Date(),
+      }
+    })
+
+    return response.data.user;
+  },{
+    onSuccess: () => {
+      queryClient.invalidateQueries(['users'])
+    }
+  })
+
   const { register, handleSubmit, formState } = useForm({
     resolver: yupResolver(CreateUserFormSchema),
   });
 
   const { errors } = formState;
 
-  const handleCreateUser: SubmitHandler<FieldValues> = async (values) => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log(values);
+  const handleCreateUser: SubmitHandler<CreateFormData> = async (values) => {
+    await createUser.mutateAsync(values)
+
+    router.push('/users')
   };
 
   return (
