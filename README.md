@@ -27,7 +27,8 @@ $ yarn dev
 * [React Query]()
 * [Yup]()
 * [React hook form]()
-* 
+
+
 <hr>
 <p align="center">Feito com 💙 por <strong>Maikon Alexandre</strong></p>
 
